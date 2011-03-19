@@ -2282,7 +2282,7 @@ public class MimeUtility {
         return getJisVariantFromAddress(addresses[0].getAddress());
     }
 
-    private static String getJisVariantFromAddress(String address) {
+    public static String getJisVariantFromAddress(String address) {
         if (address == null)
             return null;
         if (isInDomain(address, "docomo.ne.jp") || isInDomain(address, "dwmail.jp") ||

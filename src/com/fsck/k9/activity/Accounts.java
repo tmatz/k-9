@@ -1280,12 +1280,11 @@ public class Accounts extends K9ListActivity implements OnItemClickListener {
         html.append(String.format(getString(R.string.app_libraries), libs.toString()))
         .append("</p><hr/><p>")
         .append(String.format(getString(R.string.app_emoji_icons),
-                              "<div>TypePad \u7d75\u6587\u5b57\u30a2\u30a4\u30b3\u30f3\u753b\u50cf " +
-                              "(<a href=\"http://typepad.jp/\">Six Apart Ltd</a>) / " +
-                              "<a href=\"http://creativecommons.org/licenses/by/2.1/jp/\">CC BY 2.1</a></div>"))
+                              "<div>mobylet-emoji is part of the " +
+                              "<a href=\"http://mobylet.seasar.org/\">Mobylet</a> / " +
+                              "<a href=\"http://www.apache.org/licenses/LICENSE-2.0.html\">Apache License ver2.0</a></div>"))
         .append("</p><hr/><p>")
         .append(getString(R.string.app_htmlcleaner_license));
-
 
         wv.loadDataWithBaseURL("file:///android_res/drawable/", html.toString(), "text/html", "utf-8", null);
         new AlertDialog.Builder(this)

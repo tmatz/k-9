@@ -1619,20 +1619,13 @@ public class HtmlConverter {
         case 0xFEBA0: return "EACE";    // KDDI
         case 0xFEBA1: return "EACF";    // KDDI
 
-            /* unknown */
-        case 0xFEE1C: return "E517";    // KDDI ?
-        case 0xFEE33: return "E5BC";    // KDDI ?
-        case 0xFEE40: return "E577";    // KDDI ?
-        case 0xFEE41: return "E5B2";    // KDDI ?
-        case 0xFEE42: return "E264";    // KDDI ?
-        case 0xFEE43: return "E328";    // KDDI ?
-        case 0xFEE44: return "E335";    // KDDI ?
-        case 0xFEE45: return "E33D";    // KDDI ?
-        case 0xFEE46: return "E33E";    // KDDI ?
-        case 0xFEE47: return "E33F";    // KDDI ?
-        case 0xFEE48: return "E340";    // KDDI ?
-        case 0xFEE49: return "E341";    // KDDI ?
-        case 0xFEE4A: return "E342";    // KDDI ?
+        case 0xFEE1C: return "E96E";    // KDDI
+        case 0xFEE33: return "EAFB";    // KDDI
+        case 0xFEE40: return "EA2A";    // KDDI
+        case 0xFEE41: return "EA4B";    // KDDI
+        case 0xFEE42: return "EA96";    // KDDI
+        case 0xFEE43: return "EB6D";    // KDDI
+        case 0xFEE44: return "EB7A";    // KDDI
         default: return null;
         }
     }

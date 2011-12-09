@@ -145,9 +145,10 @@ public class EncoderUtil {
     }
 
     private static byte[] encode(String text, Charset charset) {
-        ByteBuffer buffer = charset.encode(text);
-        byte[] bytes = new byte[buffer.limit()];
-        buffer.get(bytes);
+        // Add "\n" which work around for converting to ISO-2022-JP
+        ByteBuffer buffer = charset.encode(text + "\n");
+        byte[] bytes = new byte[buffer.limit()-1];
+        buffer.get(bytes, 0, buffer.limit()-1);
         return bytes;
     }
 

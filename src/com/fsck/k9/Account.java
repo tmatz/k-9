@@ -214,6 +214,7 @@ public class Account implements BaseAccount {
     private boolean mAllowRemoteSearch;
     private boolean mRemoteSearchFullText;
     private int mRemoteSearchNumResults;
+    private String mMessageCharset;
 
     private CryptoProvider mCryptoProvider = null;
 
@@ -311,6 +312,7 @@ public class Account implements BaseAccount {
         mAllowRemoteSearch = false;
         mRemoteSearchFullText = false;
         mRemoteSearchNumResults = DEFAULT_REMOTE_SEARCH_NUM_RESULTS;
+        mMessageCharset = null;
         mEnabled = true;
         mMarkMessageAsReadOnView = true;
         mAlwaysShowCcBcc = false;
@@ -496,6 +498,7 @@ public class Account implements BaseAccount {
         mRemoteSearchFullText = prefs.getBoolean(mUuid + ".remoteSearchFullText", false);
         mRemoteSearchNumResults = prefs.getInt(mUuid + ".remoteSearchNumResults", DEFAULT_REMOTE_SEARCH_NUM_RESULTS);
 
+        mMessageCharset = prefs.getString(mUuid + ".messageCharset", "UTF-8");
         mEnabled = prefs.getBoolean(mUuid + ".enabled", true);
         mMarkMessageAsReadOnView = prefs.getBoolean(mUuid + ".markMessageAsReadOnView", true);
         mAlwaysShowCcBcc = prefs.getBoolean(mUuid + ".alwaysShowCcBcc", false);
@@ -759,6 +762,7 @@ public class Account implements BaseAccount {
         editor.putBoolean(mUuid + ".allowRemoteSearch", mAllowRemoteSearch);
         editor.putBoolean(mUuid + ".remoteSearchFullText", mRemoteSearchFullText);
         editor.putInt(mUuid + ".remoteSearchNumResults", mRemoteSearchNumResults);
+        editor.putString(mUuid + ".messageCharset", mMessageCharset);
         editor.putBoolean(mUuid + ".enabled", mEnabled);
         editor.putBoolean(mUuid + ".markMessageAsReadOnView", mMarkMessageAsReadOnView);
         editor.putBoolean(mUuid + ".alwaysShowCcBcc", mAlwaysShowCcBcc);
@@ -1687,6 +1691,14 @@ public class Account implements BaseAccount {
 
     public void setRemoteSearchNumResults(int val) {
         mRemoteSearchNumResults = (val >= 0 ? val : 0);
+    }
+
+    public String getMessageCharset() {
+        return mMessageCharset;
+    }
+
+    public void setMessageCharset(String messageCharset) {
+        mMessageCharset = messageCharset;
     }
 
     public String getInboxFolderName() {

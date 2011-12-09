@@ -3559,7 +3559,7 @@ public class MessagingController implements Runnable {
                         message.setFlag(Flag.X_SEND_IN_PROGRESS, true);
                         if (K9.DEBUG)
                             Log.i(K9.LOG_TAG, "Sending message with UID " + message.getUid());
-                        transport.sendMessage(message);
+                        transport.sendMessage(message, account.getMessageCharset());
                         message.setFlag(Flag.X_SEND_IN_PROGRESS, false);
                         message.setFlag(Flag.SEEN, true);
                         progress++;

@@ -66,7 +66,6 @@ public class WebDavTransport extends Transport {
 
     @Override
     public void sendMessage(Message message, String charset) throws MessagingException {
-        // TODO: Should use charset
         store.sendMessages(new Message[] { message });
     }
 }

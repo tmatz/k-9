@@ -920,6 +920,14 @@ public class MimeUtility {
         {".*", "US-ASCII"}
     };
 
+    public static final String[][] CONTENT_TRANSFER_ENCODING_MAP = new String[][] {
+        {"US-ASCII",    "7bit", "7bit"},
+        {"UTF-8",       "8bit", "base64"},
+        {"ISO-8859-1",  "8bit", "quoted-printable"},
+        {"Shift_JIS",   "8bit", "base64"},
+        {"ISO-2022-JP", "7bit", "7bit"}
+    };
+
     public static String unfold(String s) {
         if (s == null) {
             return null;
@@ -2090,6 +2098,20 @@ public class MimeUtility {
         }
 
         return null;
+    }
+
+    public static String getContentTransferEncoding(String charset, boolean safe8bit) {
+        for (String[] contentTransferEncodingMapEntry : CONTENT_TRANSFER_ENCODING_MAP) {
+            if (contentTransferEncodingMapEntry[0].equalsIgnoreCase(charset)) {
+                if (safe8bit) {
+                    return contentTransferEncodingMapEntry[1];
+                }
+                else {
+                    return contentTransferEncodingMapEntry[2];
+                }
+            }
+        }
+        return "base64";
     }
 
     public static String getMimeTypeByExtension(String filename) {

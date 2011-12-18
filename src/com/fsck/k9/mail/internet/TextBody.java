@@ -2,11 +2,11 @@
 package com.fsck.k9.mail.internet;
 
 import com.fsck.k9.mail.Body;
+import com.fsck.k9.mail.filter.Base64OutputStream;
 import com.fsck.k9.mail.MessagingException;
 
 import java.io.*;
 
-import org.apache.james.mime4j.codec.Base64OutputStream;
 import org.apache.james.mime4j.codec.QuotedPrintableOutputStream;
 import org.apache.james.mime4j.util.MimeUtil;
 
@@ -38,7 +38,7 @@ public class TextBody implements Body {
             } else if ("base64".equals(mEncoding)) {
                 Base64OutputStream bp = new Base64OutputStream(out);
                 bp.write(bytes);
-                bp.flush();
+                bp.close(); // not bp.flush() but close()
             } else {
                 QuotedPrintableOutputStream qp = new QuotedPrintableOutputStream(out, false);
                 qp.write(bytes);

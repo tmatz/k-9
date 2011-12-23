@@ -85,6 +85,8 @@ import com.fsck.k9.mail.internet.TextBody;
 import com.fsck.k9.mail.store.LocalStore.LocalAttachmentBody;
 import com.fsck.k9.mail.store.LocalStore.TempFileBody;
 import com.fsck.k9.mail.store.LocalStore.TempFileMessageBody;
+import com.fsck.k9.mail.store.LocalStore.LocalAttachmentMessageBody;
+import com.fsck.k9.view.AddressMultiAutoCompleteTextView;
 import com.fsck.k9.view.MessageWebView;
 import org.apache.james.mime4j.codec.EncoderUtil;
 import org.apache.james.mime4j.util.MimeUtil;
@@ -272,9 +274,9 @@ public class MessageCompose extends K9Activity implements OnClickListener,
     private Button mChooseIdentityButton;
     private LinearLayout mCcWrapper;
     private LinearLayout mBccWrapper;
-    private MultiAutoCompleteTextView mToView;
-    private MultiAutoCompleteTextView mCcView;
-    private MultiAutoCompleteTextView mBccView;
+    private AddressMultiAutoCompleteTextView mToView;
+    private AddressMultiAutoCompleteTextView mCcView;
+    private AddressMultiAutoCompleteTextView mBccView;
     private EditText mSubjectView;
     private EolConvertingEditText mSignatureView;
     private EolConvertingEditText mMessageContentView;
@@ -575,9 +577,9 @@ public class MessageCompose extends K9Activity implements OnClickListener,
             mChooseIdentityButton.setVisibility(View.GONE);
         }
 
-        mToView = (MultiAutoCompleteTextView) findViewById(R.id.to);
-        mCcView = (MultiAutoCompleteTextView) findViewById(R.id.cc);
-        mBccView = (MultiAutoCompleteTextView) findViewById(R.id.bcc);
+        mToView = (AddressMultiAutoCompleteTextView) findViewById(R.id.to);
+        mCcView = (AddressMultiAutoCompleteTextView) findViewById(R.id.cc);
+        mBccView = (AddressMultiAutoCompleteTextView) findViewById(R.id.bcc);
         mSubjectView = (EditText) findViewById(R.id.subject);
         mSubjectView.getInputExtras(true).putBoolean("allowEmoji", true);
 

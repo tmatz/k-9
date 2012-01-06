@@ -85,6 +85,7 @@ public class Account implements BaseAccount {
     public static final boolean DEFAULT_REPLY_AFTER_QUOTE = false;
     public static final boolean DEFAULT_STRIP_SIGNATURE = true;
     public static final int DEFAULT_REMOTE_SEARCH_NUM_RESULTS = 25;
+    public static final String DEFAULT_MESSAGE_CHARSET = "UTF-8";
 
     public static final String ACCOUNT_DESCRIPTION_KEY = "description";
     public static final String STORE_URI_KEY = "storeUri";
@@ -312,7 +313,7 @@ public class Account implements BaseAccount {
         mAllowRemoteSearch = false;
         mRemoteSearchFullText = false;
         mRemoteSearchNumResults = DEFAULT_REMOTE_SEARCH_NUM_RESULTS;
-        mMessageCharset = null;
+        mMessageCharset = DEFAULT_MESSAGE_CHARSET;
         mEnabled = true;
         mMarkMessageAsReadOnView = true;
         mAlwaysShowCcBcc = false;

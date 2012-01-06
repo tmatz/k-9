@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 import org.apache.james.mime4j.util.MimeUtil;
 
+import com.fsck.k9.mail.internet.MimeHeader;
 import com.fsck.k9.mail.internet.MimeUtility;
 import com.fsck.k9.mail.internet.TextBody;
 

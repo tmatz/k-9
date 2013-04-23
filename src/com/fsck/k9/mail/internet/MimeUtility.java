@@ -1091,7 +1091,7 @@ public class MimeUtility {
                      */
                     InputStream in = part.getBody().getInputStream();
                     try {
-                        String text = readToString(in, charset);
+                        String text = readToString(in, charset, mimeType);
 
                         // Replace the body with a TextBody that already contains the decoded text
                         part.setBody(new TextBody(text));
@@ -2074,6 +2074,13 @@ public class MimeUtility {
             return true;
         }
         /*
+         * If the part is x-pmaildx text and it got this far it's part of a
+         * mixed (et al) and should be rendered inline.
+         */
+        else if ((!attachment) && (part.getMimeType().equalsIgnoreCase("text/x-pmaildx"))) {
+            return true;
+        }
+        /*
          * Finally, if it's nothing else we will include it as an attachment.
          */
         else {
@@ -2321,8 +2328,16 @@ public class MimeUtility {
     }
 
     public static String readToString(InputStream in, String charset) throws IOException {
+        return readToString(in, charset, null);
+    }
+
+    public static String readToString(InputStream in, String charset, String mimeTypes) throws IOException {
         boolean isIphoneString = false;
 
+        if ("iso-2022-jp".equals(charset) && "text/x-pmaildx".equals(mimeTypes)) {
+            in = new Iso2022JpToShiftJisInputStream(in);
+            charset = "x-docomo-shift_jis-2007";
+        }
         // iso-2022-jp variants are supported by no versions as of Dec 2010.
         if (charset.length() > 19 && charset.startsWith("x-") &&
                 charset.endsWith("-iso-2022-jp-2007") && !Charset.isSupported(charset)) {

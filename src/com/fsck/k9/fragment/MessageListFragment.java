@@ -1782,6 +1782,8 @@ public class MessageListFragment extends SherlockFragment implements OnItemClick
             holder.chip = view.findViewById(R.id.chip);
             holder.preview = (TextView) view.findViewById(R.id.preview);
 
+            holder.preview.setTypeface(K9.typefaceGoomoji);
+
             QuickContactBadge contactBadge =
                     (QuickContactBadge) view.findViewById(R.id.contact_badge);
             if (mContactsPictureLoader != null) {
@@ -2019,7 +2021,7 @@ public class MessageListFragment extends SherlockFragment implements OnItemClick
                             null); // bottom
                 }
 
-                holder.subject.setTypeface(null, maybeBoldTypeface);
+                holder.subject.setTypeface(K9.typefaceGoomoji, maybeBoldTypeface);
                 holder.subject.setText(subject);
             }
 

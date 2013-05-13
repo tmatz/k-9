@@ -105,6 +105,8 @@ public class MessageHeader extends ScrollView implements OnClickListener {
         mDateView = (TextView) findViewById(R.id.date);
         mFlagged = (CheckBox) findViewById(R.id.flagged);
 
+		mSubjectView.setTypeface(K9.typefaceGoomoji);
+
         defaultSubjectColor = mSubjectView.getCurrentTextColor();
         mFontSizes.setViewTextSize(mSubjectView, mFontSizes.getMessageViewSubject());
         mFontSizes.setViewTextSize(mDateView, mFontSizes.getMessageViewDate());

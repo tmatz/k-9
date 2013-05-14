@@ -172,9 +172,9 @@ public class K9 extends Application {
     public static String ERROR_FOLDER_NAME = "K9mail-errors";
     
     /**
-     * Typeface for goomoji (emoji internal representation).
+     * Typeface for emoji.
      */
-    public static Typeface typefaceGoomoji = null;
+    public static Typeface typefaceEmoji = null;
 
     /**
      * A reference to the {@link SharedPreferences} used for caching the last known database
@@ -561,9 +561,9 @@ public class K9 extends Application {
         BinaryTempFileBody.setTempDirectory(getCacheDir());
         
         /*
-         * Build typeface for goomoji.
+         * Build typeface for emoji.
          */
-        typefaceGoomoji = Typeface.createFromAsset(getAssets(), "GoomojiSymbola.ttf");
+        typefaceEmoji = Typeface.createFromAsset(getAssets(), "SymbolaGoomoji.ttf");
 
         /*
          * Enable background sync of messages

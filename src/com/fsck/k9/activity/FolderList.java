@@ -1,13 +1,22 @@
 package com.fsck.k9.activity;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.PowerManager;
 import android.text.TextUtils.TruncateAt;
@@ -44,9 +53,12 @@ import com.fsck.k9.FontSizes;
 import com.fsck.k9.K9;
 import com.fsck.k9.Preferences;
 import com.fsck.k9.R;
+import com.fsck.k9.activity.misc.ExtendedAsyncTask;
+import com.fsck.k9.activity.misc.NonConfigurationInstance;
 import com.fsck.k9.activity.setup.AccountSettings;
 import com.fsck.k9.activity.setup.FolderSettings;
 import com.fsck.k9.activity.setup.Prefs;
+import com.fsck.k9.controller.MessageRetrievalListener;
 import com.fsck.k9.controller.MessagingController;
 import com.fsck.k9.controller.MessagingListener;
 import com.fsck.k9.helper.SizeFormatter;
@@ -97,6 +109,13 @@ public class FolderList extends K9ListActivity {
     private TextView mActionBarTitle;
     private TextView mActionBarSubTitle;
     private TextView mActionBarUnread;
+
+    /**
+     * Contains information about objects that need to be retained on configuration changes.
+     *
+     * @see #onRetainNonConfigurationInstance()
+     */
+    private NonConfigurationInstance mNonConfigurationInstance;
 
     class FolderListHandler extends Handler {
 
@@ -280,6 +299,14 @@ public class FolderList extends K9ListActivity {
 
         context = this;
 
+        /* TODO:
+        // Handle activity restarts because of a configuration change (e.g. rotating the screen)
+        mNonConfigurationInstance = (NonConfigurationInstance)getLastNonConfigurationInstance();
+        if (mNonConfigurationInstance != null) {
+            mNonConfigurationInstance.restore(this);
+        }
+        */
+
         ChangeLog cl = new ChangeLog(this);
         if (cl.isFirstRun()) {
             cl.getLogDialog().show();
@@ -340,8 +367,18 @@ public class FolderList extends K9ListActivity {
     }
 
 
+    /**
+     * Save the reference to a currently displayed dialog or a running AsyncTask (if available).
+     */
     @Override public Object onRetainNonConfigurationInstance() {
         return (mAdapter == null) ? null : mAdapter.mFolders;
+/* TODO:
+        Object retain = null;
+        if (mNonConfigurationInstance != null && mNonConfigurationInstance.retain()) {
+            retain = mNonConfigurationInstance;
+        }
+        return retain;
+*/
     }
 
     @Override public void onPause() {
@@ -479,8 +516,131 @@ public class FolderList extends K9ListActivity {
     }
 
 
+    private void onExportFolder(Account account, String folderName) {
 
+        try
+        {
+            if (account == null || folderName == null || !account.isAvailable(FolderList.this)) {
+                Log.i(K9.LOG_TAG, "not clear folder of unavailable account");
+                return;
+            }
 
+            File dir = new File(Environment.getExternalStorageDirectory() + File.separator
+                    + context.getPackageName());
+            dir.mkdirs();
+
+            ExportAsyncTask asyncTask = new ExportAsyncTask(this, dir, folderName, account);
+//            setNonConfigurationInstance(asyncTask);
+            asyncTask.execute();
+
+        }
+        catch (Exception e) {
+            Log.e(K9.LOG_TAG, "Exception while clearing folder", e);
+        }
+    }
+
+    /**
+     * Handles exporting of messages in a background thread.
+     */
+    private static class ExportAsyncTask extends ExtendedAsyncTask<Void, Void, Boolean> {
+        private File mDir;
+        private String mFolderName;
+        private LocalFolder mLocalFolder;
+
+        public ExportAsyncTask(FolderList activity, File dir, String folderName, Account account) throws MessagingException {
+            super(activity);
+            mDir = dir;
+            mFolderName = folderName;
+            mLocalFolder = account.getLocalStore().getFolder(folderName);
+        }
+
+        @Override
+        protected void showProgressDialog() {
+            String title = mContext.getString(R.string.settings_export_dialog_title);
+            String message = mContext.getString(R.string.settings_exporting);
+            mProgressDialog = new ProgressDialog(mActivity);
+            mProgressDialog.setTitle(title);
+            mProgressDialog.setMessage(message);
+            mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+            mProgressDialog.setIndeterminate(true);
+            mProgressDialog.show();
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+
+            try {
+                mLocalFolder.open(Folder.OpenMode.READ_WRITE);
+                mLocalFolder.exportAllMessages(mDir,
+                        new MessageRetrievalListener() {
+                            @Override
+                            public void messageFinished(Message message, final int number, final int ofTotal) {
+                                mActivity.runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        mProgressDialog.setIndeterminate(false);
+                                        mProgressDialog.setMax(ofTotal);
+                                        mProgressDialog.setProgress(number);
+                                    }
+                                });
+                            }
+
+                            @Override
+                            public void messageStarted(final String uid, final int number, final int ofTotal) {
+                            }
+
+                            @Override
+                            public void messagesFinished(int total) {
+                                // FIXME this method is almost never invoked by various Stores! Don't rely on it unless fixed!!
+                            }
+                        });
+            }
+            catch (MessagingException e) {
+            }
+
+            return true;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean success) {
+            FolderList activity = (FolderList)mActivity;
+
+            // Let the activity know that the background task is complete
+//            activity.setNonConfigurationInstance(null);
+
+            mLocalFolder.close();
+            removeProgressDialog();
+
+            if (success) {
+            }
+            else {
+            }
+
+            final AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+            builder.setTitle(mFolderName + " exporting complete");
+            builder.setMessage(mFolderName + ": message");
+            builder.setPositiveButton(R.string.okay_action,
+            new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                }
+            });
+            builder.show();
+        }
+    }
+
+    /**
+     * Set the {@code NonConfigurationInstance} this activity should retain on configuration
+     * changes.
+     *
+     * @param inst
+     *         The {@link NonConfigurationInstance} that should be retained when
+     *         {@link FolderList#onRetainNonConfigurationInstance()} is called.
+     */
+    private void setNonConfigurationInstance(NonConfigurationInstance inst) {
+        mNonConfigurationInstance = inst;
+    }
 
     private void sendMail(Account account) {
         MessagingController.getInstance(getApplication()).sendPendingMessages(account, mAdapter.mListener);
@@ -627,6 +787,9 @@ public class FolderList extends K9ListActivity {
             break;
         case R.id.refresh_folder:
             checkMail(folder);
+            break;
+        case R.id.export_folder:
+            onExportFolder(mAccount, folder.name);
             break;
         case R.id.folder_settings:
             FolderSettings.actionSettings(this, mAccount, folder.name);

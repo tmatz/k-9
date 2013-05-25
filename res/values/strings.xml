@@ -153,6 +153,7 @@ Please submit bug reports, contribute new features and ask questions at
     <string name="global_settings_action">Global settings</string>
     <string name="remove_account_action">Remove account</string>
     <string name="clear_pending_action">Clear pending actions (danger!)</string>
+    <string name="export_folder_action">Export folder</string>
 
     <string name="mark_as_read_action">Mark as read</string>
     <string name="send_alternate_action">Share</string>

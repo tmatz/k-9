@@ -1,9 +1,12 @@
 package com.fsck.k9.activity.misc;
 
+import com.fsck.k9.K9;
+
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
+import android.util.Log;
 
 /**
  * Extends {@link AsyncTask} with methods to attach and detach an {@link Activity}.
@@ -51,6 +54,7 @@ public abstract class ExtendedAsyncTask<Params, Progress, Result>
      */
     @Override
     public void restore(Activity activity) {
+        Log.e(K9.LOG_TAG, String.format("restore() called"));
         mActivity = activity;
         showProgressDialog();
     }
@@ -71,6 +75,7 @@ public abstract class ExtendedAsyncTask<Params, Progress, Result>
      */
     @Override
     public boolean retain() {
+        Log.e(K9.LOG_TAG, String.format("retain() called"));
         boolean retain = false;
         if (mProgressDialog != null) {
             removeProgressDialog();
@@ -92,6 +97,7 @@ public abstract class ExtendedAsyncTask<Params, Progress, Result>
     protected abstract void showProgressDialog();
 
     protected void removeProgressDialog() {
+        Log.e(K9.LOG_TAG, String.format("removeProgressDialog() called"));
         mProgressDialog.dismiss();
         mProgressDialog = null;
     }
@@ -106,6 +112,8 @@ public abstract class ExtendedAsyncTask<Params, Progress, Result>
      */
     @Override
     protected void onPreExecute() {
+        Log.e(K9.LOG_TAG, String.format("onPreExecute() called"));
+
         showProgressDialog();
     }
 }

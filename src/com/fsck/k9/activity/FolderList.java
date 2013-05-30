@@ -54,7 +54,9 @@ import com.fsck.k9.K9;
 import com.fsck.k9.Preferences;
 import com.fsck.k9.R;
 import com.fsck.k9.activity.misc.ExtendedAsyncTask;
+import com.fsck.k9.activity.misc.NonConfigurationFolderAdapter;
 import com.fsck.k9.activity.misc.NonConfigurationInstance;
+import com.fsck.k9.activity.misc.NonConfigurationList;
 import com.fsck.k9.activity.setup.AccountSettings;
 import com.fsck.k9.activity.setup.FolderSettings;
 import com.fsck.k9.activity.setup.Prefs;
@@ -115,7 +117,7 @@ public class FolderList extends K9ListActivity {
      *
      * @see #onRetainNonConfigurationInstance()
      */
-    private NonConfigurationInstance mNonConfigurationInstance;
+    private NonConfigurationList mNonConfigurationList;
 
     class FolderListHandler extends Handler {
 
@@ -299,14 +301,6 @@ public class FolderList extends K9ListActivity {
 
         context = this;
 
-        /* TODO:
-        // Handle activity restarts because of a configuration change (e.g. rotating the screen)
-        mNonConfigurationInstance = (NonConfigurationInstance)getLastNonConfigurationInstance();
-        if (mNonConfigurationInstance != null) {
-            mNonConfigurationInstance.restore(this);
-        }
-        */
-
         ChangeLog cl = new ChangeLog(this);
         if (cl.isFirstRun()) {
             cl.getLogDialog().show();
@@ -356,13 +350,20 @@ public class FolderList extends K9ListActivity {
         getListView().setTextFilterEnabled(mAdapter.getFilter() != null); // should never be false but better safe then sorry
     }
 
+    public void restoreFolders(ArrayList<FolderInfoHolder> previous) {
+        mAdapter.mFolders = previous;
+        mAdapter.mFilteredFolders = Collections.unmodifiableList(mAdapter.mFolders);
+    }
+
     @SuppressWarnings("unchecked")
     private void restorePreviousData() {
-        final Object previousData = getLastNonConfigurationInstance();
-
-        if (previousData != null) {
-            mAdapter.mFolders = (ArrayList<FolderInfoHolder>) previousData;
-            mAdapter.mFilteredFolders = Collections.unmodifiableList(mAdapter.mFolders);
+        // Handle activity restarts because of a configuration change (e.g. rotating the screen)
+        mNonConfigurationList = (NonConfigurationList)getLastNonConfigurationInstance();
+        Log.e(K9.LOG_TAG, String.format("restorePreviousData() called"));
+        if (mNonConfigurationList != null) {
+            Log.e(K9.LOG_TAG, String.format("restorePreviousData() check 1"));
+            mNonConfigurationList.restore(this);
+            mNonConfigurationList.clear(ArrayList.class);
         }
     }
 
@@ -371,14 +372,19 @@ public class FolderList extends K9ListActivity {
      * Save the reference to a currently displayed dialog or a running AsyncTask (if available).
      */
     @Override public Object onRetainNonConfigurationInstance() {
-        return (mAdapter == null) ? null : mAdapter.mFolders;
-/* TODO:
+        Log.e(K9.LOG_TAG, String.format("onRetainNonConfigurationInstance() called %s", mNonConfigurationList == null ? "null" : mNonConfigurationList.toString()));
         Object retain = null;
-        if (mNonConfigurationInstance != null && mNonConfigurationInstance.retain()) {
-            retain = mNonConfigurationInstance;
+        if (mAdapter != null) {
+            Log.e(K9.LOG_TAG, String.format("onRetainNonConfigurationInstance() called check1"));
+            setNonConfigurationInstance(new NonConfigurationFolderAdapter(mAdapter.mFolders));
+            retain = mNonConfigurationList;
+        }
+
+        if (mNonConfigurationList != null && mNonConfigurationList.retain()) {
+            Log.e(K9.LOG_TAG, String.format("onRetainNonConfigurationInstance() called check2"));
+            retain = mNonConfigurationList;
         }
         return retain;
-*/
     }
 
     @Override public void onPause() {
@@ -515,9 +521,7 @@ public class FolderList extends K9ListActivity {
         onRefresh(!REFRESH_REMOTE);
     }
 
-
     private void onExportFolder(Account account, String folderName) {
-
         try
         {
             if (account == null || folderName == null || !account.isAvailable(FolderList.this)) {
@@ -530,7 +534,8 @@ public class FolderList extends K9ListActivity {
             dir.mkdirs();
 
             ExportAsyncTask asyncTask = new ExportAsyncTask(this, dir, folderName, account);
-//            setNonConfigurationInstance(asyncTask);
+            Log.e(K9.LOG_TAG, String.format("setNonConfigurationInstance() call"));
+            setNonConfigurationInstance(asyncTask);
             asyncTask.execute();
 
         }
@@ -596,6 +601,8 @@ public class FolderList extends K9ListActivity {
                         });
             }
             catch (MessagingException e) {
+                Log.e(K9.LOG_TAG, "failed to exportAllMessages()", e);
+                return false;
             }
 
             return true;
@@ -603,22 +610,29 @@ public class FolderList extends K9ListActivity {
 
         @Override
         protected void onPostExecute(Boolean success) {
+            Log.e(K9.LOG_TAG, String.format("onPostExecute() called: %s", success.toString()));
             FolderList activity = (FolderList)mActivity;
 
             // Let the activity know that the background task is complete
-//            activity.setNonConfigurationInstance(null);
+            activity.clearNonConfigurationInstance();
 
             mLocalFolder.close();
             removeProgressDialog();
 
+            String title;
+            String message;
             if (success) {
+                title = "Complete message exporting";
+                message = mFolderName + " exported";
             }
             else {
+                title = "Failed message exporting";
+                message = mFolderName + " failed";
             }
 
             final AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-            builder.setTitle(mFolderName + " exporting complete");
-            builder.setMessage(mFolderName + ": message");
+            builder.setTitle(title);
+            builder.setMessage(message);
             builder.setPositiveButton(R.string.okay_action,
             new DialogInterface.OnClickListener() {
                 @Override
@@ -639,7 +653,18 @@ public class FolderList extends K9ListActivity {
      *         {@link FolderList#onRetainNonConfigurationInstance()} is called.
      */
     private void setNonConfigurationInstance(NonConfigurationInstance inst) {
-        mNonConfigurationInstance = inst;
+
+        if (mNonConfigurationList == null) {
+            mNonConfigurationList = new NonConfigurationList(this);
+        }
+        Log.e(K9.LOG_TAG, String.format("setNonConfigurationInstance() called"));
+        mNonConfigurationList.add(inst);
+    }
+
+    private void clearNonConfigurationInstance() {
+        if (mNonConfigurationList != null) {
+            mNonConfigurationList.clear(ExportAsyncTask.class);
+        }
     }
 
     private void sendMail(Account account) {

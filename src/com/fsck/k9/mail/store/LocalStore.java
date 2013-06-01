@@ -3097,19 +3097,20 @@ public class LocalStore extends Store implements Serializable {
                     listener.messageFinished(null, 0, localMessages.length);
                 }
 
-                int i = 0;
+                int i = 1;
                 for (Message msg : localMessages) {
-                    File file = Utility.createUniqueFile(dir, msg.getUid() + ".eml");
+                    File file = Utility.createUniqueFile(dir, String.format("%d.eml", i));
                     EOLConvertingOutputStream os = new EOLConvertingOutputStream(new FileOutputStream(file.getAbsolutePath()));
                     try {
                         msg.writeTo(os);
                         if (listener != null) {
-                            listener.messageFinished(msg, ++i, localMessages.length);
+                            listener.messageFinished(msg, i, localMessages.length);
                         }
                     }
                     finally {
                         os.close();
                     }
+                    i++;
                 }
             }
             catch (IOException e) {

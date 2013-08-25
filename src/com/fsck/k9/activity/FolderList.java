@@ -575,7 +575,7 @@ public class FolderList extends K9ListActivity {
         protected Boolean doInBackground(Void... params) {
 
             try {
-                mLocalFolder.open(Folder.OpenMode.READ_WRITE);
+                mLocalFolder.open(Folder.OPEN_MODE_RW);
                 mLocalFolder.exportAllMessages(mDir,
                         new MessageRetrievalListener() {
                             @Override

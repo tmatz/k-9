@@ -3063,14 +3063,14 @@ public class LocalStore extends Store implements Serializable {
         public void exportAllMessages(final File dir, final MessageRetrievalListener listener) throws MessagingException {
             Message[] localMessages;
 
-            open(OpenMode.READ_ONLY);
+            open(OPEN_MODE_RO);
 
             try {
                 localMessages = database.execute(false, new DbCallback<Message[]>() {
                     @Override
                     public Message[] doDbWork(final SQLiteDatabase db) throws WrappedException, UnavailableStorageException {
                         try {
-                            open(OpenMode.READ_WRITE);
+                            open(OPEN_MODE_RW);
                             return LocalStore.this.getMessages(
                                        null,
                                        LocalFolder.this,

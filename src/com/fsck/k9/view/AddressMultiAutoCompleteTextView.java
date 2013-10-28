@@ -7,6 +7,8 @@ import com.fsck.k9.mail.Address;
 
 public class AddressMultiAutoCompleteTextView extends MultiAutoCompleteTextView {
 
+    final static boolean addressOnly = false;
+
     public AddressMultiAutoCompleteTextView(Context context) {
         super(context);
     }
@@ -20,7 +22,13 @@ public class AddressMultiAutoCompleteTextView extends MultiAutoCompleteTextView 
     }
 
     protected void replaceText(CharSequence text) {
+        String result = text.toString();
+
         Address address = new Address(text.toString());
-        super.replaceText(address.getAddress());
+        String name = address.getPersonal();
+        if (name == null || addressOnly) {
+            result = address.getAddress();
+        }
+        super.replaceText(result);
     }
 }

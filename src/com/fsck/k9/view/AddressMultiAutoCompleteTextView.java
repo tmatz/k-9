@@ -7,17 +7,20 @@ import com.fsck.k9.mail.Address;
 
 public class AddressMultiAutoCompleteTextView extends MultiAutoCompleteTextView {
 
-	public AddressMultiAutoCompleteTextView(Context context) {
-		super(context);
-	}
-	public AddressMultiAutoCompleteTextView(Context context, AttributeSet attrs) {
-		super(context, attrs);
-	}
-	public AddressMultiAutoCompleteTextView(Context context, AttributeSet attrs, int defStyle) {
-		super(context, attrs, defStyle);
-	}
-	protected void replaceText(CharSequence text) {
-		Address address = new Address(text.toString());
-		super.replaceText(address.getAddress());
-	}
+    public AddressMultiAutoCompleteTextView(Context context) {
+        super(context);
+    }
+
+    public AddressMultiAutoCompleteTextView(Context context, AttributeSet attrs) {
+        super(context, attrs);
+    }
+
+    public AddressMultiAutoCompleteTextView(Context context, AttributeSet attrs, int defStyle) {
+        super(context, attrs, defStyle);
+    }
+
+    protected void replaceText(CharSequence text) {
+        Address address = new Address(text.toString());
+        super.replaceText(address.getAddress());
+    }
 }

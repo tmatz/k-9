@@ -25,6 +25,7 @@ import android.widget.Toast;
 import com.fsck.k9.K9;
 import com.fsck.k9.K9.NotificationHideSubject;
 import com.fsck.k9.K9.NotificationQuickDelete;
+import com.fsck.k9.K9.RecipientAddressFormat;
 import com.fsck.k9.K9.SplitViewMode;
 import com.fsck.k9.Preferences;
 import com.fsck.k9.R;
@@ -97,6 +98,7 @@ public class Prefs extends K9PreferenceActivity {
     private static final String PREFERENCE_THREADED_VIEW = "threaded_view";
     private static final String PREFERENCE_FOLDERLIST_WRAP_NAME = "folderlist_wrap_folder_name";
     private static final String PREFERENCE_SPLITVIEW_MODE = "splitview_mode";
+    private static final String PREFERENCE_RECIPIENT_ADDRESS_FORMAT = "recipient_address_format";
 
     private static final int ACTIVITY_CHOOSE_FOLDER = 1;
 
@@ -151,7 +153,7 @@ public class Prefs extends K9PreferenceActivity {
     private CheckBoxPreference mBackgroundAsUnreadIndicator;
     private CheckBoxPreference mThreadedView;
     private ListPreference mSplitViewMode;
-
+    private ListPreference mRecipientAddressFormat;
 
     public static void actionPrefs(Context context) {
         Intent i = new Intent(context, Prefs.class);
@@ -439,6 +441,10 @@ public class Prefs extends K9PreferenceActivity {
         mSplitViewMode = (ListPreference) findPreference(PREFERENCE_SPLITVIEW_MODE);
         initListPreference(mSplitViewMode, K9.getSplitViewMode().name(),
                 mSplitViewMode.getEntries(), mSplitViewMode.getEntryValues());
+
+        mRecipientAddressFormat = (ListPreference)findPreference(PREFERENCE_RECIPIENT_ADDRESS_FORMAT);
+        initListPreference(mRecipientAddressFormat, K9.getRecipientAddressFormat().name(),
+                mRecipientAddressFormat.getEntries(), mRecipientAddressFormat.getEntryValues());
     }
 
     private static String themeIdToName(K9.Theme theme) {
@@ -525,6 +531,7 @@ public class Prefs extends K9PreferenceActivity {
         K9.setAttachmentDefaultPath(mAttachmentPathPreference.getSummary().toString());
         boolean needsRefresh = K9.setBackgroundOps(mBackgroundOps.getValue());
         K9.setUseGalleryBugWorkaround(mUseGalleryBugWorkaround.isChecked());
+        K9.setRecipientAddressFormat(RecipientAddressFormat.valueOf(mRecipientAddressFormat.getValue()));
 
         if (!K9.DEBUG && mDebugLogging.isChecked()) {
             Toast.makeText(this, R.string.debug_logging_enabled, Toast.LENGTH_LONG).show();

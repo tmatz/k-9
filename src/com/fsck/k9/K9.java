@@ -279,6 +279,7 @@ public class K9 extends Application {
     private static boolean sMessageViewCopyActionVisible = false;
     private static boolean sMessageViewSpamActionVisible = false;
 
+    private static RecipientAddressFormat mRecipientAddressFormat = RecipientAddressFormat.NAME_AND_ADDRESS;
 
     /**
      * @see #areDatabasesUpToDate()
@@ -383,6 +384,7 @@ public class K9 extends Application {
     public static final int CERTIFICATE_EXCEPTION_NOTIFICATION_OUTGOING = -2500;
     public static final int CONNECTIVITY_ID = -3;
 
+    public static final RecipientAddressFormat DEFAULT_RECIPIENT_ADDRESS_FORMAT = RecipientAddressFormat.NAME_AND_ADDRESS;
 
     public static class Intents {
 
@@ -878,6 +880,10 @@ public class K9 extends Application {
         LIGHT,
         DARK,
         USE_GLOBAL
+    }
+
+    public enum RecipientAddressFormat {
+        NAME_AND_ADDRESS, ADDRESS_ONLY
     }
 
     public static int getK9ThemeResourceId(Theme themeId) {
@@ -1412,5 +1418,13 @@ public class K9 extends Application {
             editor.putInt(KEY_LAST_ACCOUNT_DATABASE_VERSION, LocalStore.DB_VERSION);
             editor.commit();
         }
+    }
+
+    public static RecipientAddressFormat getRecipientAddressFormat() {
+        return mRecipientAddressFormat;
+    }
+
+    public static void setRecipientAddressFormat(RecipientAddressFormat recipientAddressFormat) {
+        K9.mRecipientAddressFormat = recipientAddressFormat;
     }
 }

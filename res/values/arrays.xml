@@ -735,4 +735,14 @@
         <item>NEVER</item>
         <item>WHEN_IN_LANDSCAPE</item>
     </string-array>
+
+    <string-array name="global_settings_recipient_address_format_entries">
+        <item>@string/global_settings_recipient_address_format_name_and_address</item>
+        <item>@string/global_settings_recipient_address_format_address_only</item>
+    </string-array>
+
+    <string-array name="global_settings_recipient_address_format_values" translatable="false">
+        <item>NAME_AND_ADDRESS</item>
+        <item>ADDRESS_ONLY</item>
+    </string-array>
 </resources>

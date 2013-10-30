@@ -357,6 +357,10 @@ Please submit bug reports, contribute new features and ask questions at
     <string name="global_settings_flag">Flag</string>
     <string name="global_settings_unselect">Unselect</string>
 
+    <string name="global_settings_recipient_address_format_label">Recipient address format</string>
+    <string name="global_settings_recipient_address_format_name_and_address">Name and Address</string>
+    <string name="global_settings_recipient_address_format_address_only">Address only</string>
+
     <string name="quiet_time">Quiet Time</string>
     <string name="quiet_time_description">Disable ringing, buzzing and flashing at night</string>
     <string name="quiet_time_starts">Quiet Time starts</string>

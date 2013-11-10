@@ -567,6 +567,8 @@ public class K9 extends Application {
         editor.putBoolean("messageViewCopyActionVisible", sMessageViewCopyActionVisible);
         editor.putBoolean("messageViewSpamActionVisible", sMessageViewSpamActionVisible);
 
+        editor.putString("recipientAddressFormat", mRecipientAddressFormat.name());
+
         fontSizes.save(editor);
     }
 
@@ -820,6 +822,11 @@ public class K9 extends Application {
         themeValue = sprefs.getInt("messageComposeTheme", Theme.USE_GLOBAL.ordinal());
         K9.setK9ComposerThemeSetting(Theme.values()[themeValue]);
         K9.setUseFixedMessageViewTheme(sprefs.getBoolean("fixedMessageViewTheme", true));
+
+        String recipientAddressFormat = sprefs.getString("recipientAddressFormat", null);
+        if (recipientAddressFormat != null) {
+            mRecipientAddressFormat = RecipientAddressFormat.valueOf(recipientAddressFormat);
+        }
     }
 
     /**

@@ -321,6 +321,10 @@
         <incoming uri="imap+ssl+://imap.gmail.com" username="$email" />
         <outgoing uri="smtp+ssl+://smtp.gmail.com" username="$email" />
     </provider>
+    <provider id="docomo" label="DoCoMo Mail" domain="docomo.ne.jp">
+        <incoming uri="imap+ssl+://imap.spmode.ne.jp" username="$user" />
+        <outgoing uri="smtp+ssl+://smtp.spmode.ne.jp" username="$user" />
+    </provider>
 
    <!-- Korean -->
     <provider id="naver" label="Naver" domain="naver.com"

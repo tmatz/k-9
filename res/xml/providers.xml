@@ -103,6 +103,12 @@
         <outgoing uri="smtp+ssl+://smtp.gmail.com" username="$email" />
     </provider>
 
+    <!-- iCloud -->
+    <provider id="icloud" label="iCloud" domain="icloud.com">
+        <incoming uri="imap+ssl+://imap.mail.me.com" username="$email" />
+        <outgoing uri="smtp+tls+://smtp.mail.me.com" username="$email" />
+    </provider>
+
     <!-- USA -->
     <!-- Note, AOL appears to support SSL on both sides, as well -->
     <provider id="aim" label="AIM" domain="aim.com">
@@ -314,6 +320,10 @@
               note="@string/provider_note_auonejp">
         <incoming uri="imap+ssl+://imap.gmail.com" username="$email" />
         <outgoing uri="smtp+ssl+://smtp.gmail.com" username="$email" />
+    </provider>
+    <provider id="docomo" label="DoCoMo Mail" domain="docomo.ne.jp">
+        <incoming uri="imap+ssl+://imap.spmode.ne.jp" username="$user" />
+        <outgoing uri="smtp+ssl+://smtp.spmode.ne.jp" username="$user" />
     </provider>
 
    <!-- Korean -->

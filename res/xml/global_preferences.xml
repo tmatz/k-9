@@ -248,6 +248,13 @@
                 android:title="@string/global_settings_messageview_autofit_width_label"
                 android:summary="@string/global_settings_messageview_autofit_width_summary"/>
 
+            <ListPreference
+                android:persistent="false"
+                android:key="recipient_address_format"
+                android:title="@string/global_settings_recipient_address_format_label"
+                android:entries="@array/global_settings_recipient_address_format_entries"
+                android:entryValues="@array/global_settings_recipient_address_format_values" />
+
         </PreferenceCategory>
 
     </PreferenceScreen>

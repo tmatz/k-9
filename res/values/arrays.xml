@@ -658,6 +658,11 @@
         <item>6</item>
     </string-array>
 
+    <string-array name="account_settings_message_charset_entries">
+        <item>UTF-8</item>
+        <item>ISO-2022-JP</item>
+    </string-array>
+
     <string-array name="account_settings_quote_style_entries">
         <item>@string/account_settings_quote_style_prefix</item>
         <item>@string/account_settings_quote_style_header</item>
@@ -734,5 +739,15 @@
         <item>ALWAYS</item>
         <item>NEVER</item>
         <item>WHEN_IN_LANDSCAPE</item>
+    </string-array>
+
+    <string-array name="global_settings_recipient_address_format_entries">
+        <item>@string/global_settings_recipient_address_format_name_and_address</item>
+        <item>@string/global_settings_recipient_address_format_address_only</item>
+    </string-array>
+
+    <string-array name="global_settings_recipient_address_format_values" translatable="false">
+        <item>NAME_AND_ADDRESS</item>
+        <item>ADDRESS_ONLY</item>
     </string-array>
 </resources>

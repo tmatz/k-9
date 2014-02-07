@@ -113,6 +113,9 @@ public class AccountSettings extends K9PreferenceActivity {
 
     private static final String PREFERENCE_LOCAL_STORAGE_PROVIDER = "local_storage_provider";
     private static final String PREFERENCE_CATEGORY_FOLDERS = "folders";
+    private static final String PREFERENCE_MESSAGE_CHARSET = "message_charset";
+
+
     private static final String PREFERENCE_ARCHIVE_FOLDER = "archive_folder";
     private static final String PREFERENCE_DRAFTS_FOLDER = "drafts_folder";
     private static final String PREFERENCE_SENT_FOLDER = "sent_folder";
@@ -183,7 +186,7 @@ public class AccountSettings extends K9PreferenceActivity {
      * So this feature is useless.
      */
     //private CheckBoxPreference mRemoteSearchFullText;
-
+    private ListPreference mMessageCharset;
     private ListPreference mLocalStorageProvider;
     private ListPreference mArchiveFolder;
     private ListPreference mDraftsFolder;
@@ -720,6 +723,19 @@ public class AccountSettings extends K9PreferenceActivity {
             mCryptoMenu.setEnabled(false);
             mCryptoMenu.setSummary(R.string.account_settings_crypto_apg_not_installed);
         }
+
+        mMessageCharset = (ListPreference) findPreference(PREFERENCE_MESSAGE_CHARSET);
+        mMessageCharset.setValue(mAccount.getMessageCharset());
+        mMessageCharset.setSummary(mMessageCharset.getEntry());
+        mMessageCharset.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+        public boolean onPreferenceChange(Preference preference, Object newValue) {
+            final String summary = newValue.toString();
+            int index = mMessageCharset.findIndexOfValue(summary);
+            mMessageCharset.setSummary(mMessageCharset.getEntries()[index]);
+            mMessageCharset.setValue(summary);
+            return false;
+        }
+        });
     }
 
     private void removeListEntry(ListPreference listPreference, String remove) {
@@ -796,6 +812,7 @@ public class AccountSettings extends K9PreferenceActivity {
             mAccount.setCryptoAutoSignature(mCryptoAutoSignature.isChecked());
             mAccount.setCryptoAutoEncrypt(mCryptoAutoEncrypt.isChecked());
         }
+        mAccount.setMessageCharset(mMessageCharset.getValue());
 
         // In webdav account we use the exact folder name also for inbox,
         // since it varies because of internationalization

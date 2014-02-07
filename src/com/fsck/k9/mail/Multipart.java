@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 import org.apache.james.mime4j.util.MimeUtil;
 
+import com.fsck.k9.mail.internet.MimeHeader;
 import com.fsck.k9.mail.internet.MimeUtility;
 import com.fsck.k9.mail.internet.TextBody;
 
@@ -60,6 +61,26 @@ public abstract class Multipart implements CompositeBody {
                 && !MimeUtil.ENC_8BIT.equalsIgnoreCase(encoding)) {
             throw new MessagingException(
                     "Incompatible content-transfer-encoding applied to a CompositeBody");
+        }
+        for (BodyPart part : mParts) {
+            try {
+                Body body = part.getBody();
+                if (body instanceof TextBody) {
+                    String[] contentType = part.getHeader("Content-Type");
+                    if (contentType.length > 0) {
+                        if (contentType[0].contains("text/plain")) {
+                            part.setHeader(MimeHeader.HEADER_CONTENT_TRANSFER_ENCODING, encoding);
+                            ((TextBody)body).setEncoding(encoding);
+                        }
+                        else if (contentType[0].contains("text/html")) {
+                            part.setHeader(MimeHeader.HEADER_CONTENT_TRANSFER_ENCODING, "8bit");
+                            ((TextBody)body).setEncoding("8bit");
+                        }
+                    }
+                }
+            } catch (MessagingException e) {
+                // Ignore
+            }
         }
 
         /* Nothing else to do.  Each subpart has its own separate encoding */

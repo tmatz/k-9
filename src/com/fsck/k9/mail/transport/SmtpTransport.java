@@ -441,7 +441,7 @@ public class SmtpTransport extends Transport {
     }
 
     @Override
-    public void sendMessage(Message message) throws MessagingException {
+    public void sendMessage(Message message, String defaultCharset) throws MessagingException {
         ArrayList<Address> addresses = new ArrayList<Address>();
         {
             addresses.addAll(Arrays.asList(message.getRecipients(RecipientType.TO)));
@@ -455,6 +455,9 @@ public class SmtpTransport extends Transport {
         for (Address address : addresses) {
             String addressString = address.getAddress();
             String charset = MimeUtility.getCharsetFromAddress(addressString);
+            if (charset == null) {
+                charset = defaultCharset;
+            }
             ArrayList<String> addressesOfCharset = charsetAddressesMap.get(charset);
             if (addressesOfCharset == null) {
                 addressesOfCharset = new ArrayList<String>();
@@ -468,6 +471,14 @@ public class SmtpTransport extends Transport {
             String charset = charsetAddressesMapEntry.getKey();
             ArrayList<String> addressesOfCharset = charsetAddressesMapEntry.getValue();
             message.setCharset(charset);
+
+            close();
+            open();
+
+            // the value of m8bitEncodingAllowed is set by open().
+            String encoding = MimeUtility.getContentTransferEncoding(charset, m8bitEncodingAllowed);
+            message.setEncoding(encoding);
+
             sendMessageTo(addressesOfCharset, message);
         }
     }
@@ -476,12 +487,10 @@ public class SmtpTransport extends Transport {
     throws MessagingException {
         boolean possibleSend = false;
 
-        close();
-        open();
-
         if (!m8bitEncodingAllowed) {
             message.setUsing7bitTransport();
         }
+
         // If the message has attachments and our server has told us about a limit on
         // the size of messages, count the message's size before sending it
         if (mLargestAcceptableMessage > 0 && ((LocalMessage)message).hasAttachments()) {

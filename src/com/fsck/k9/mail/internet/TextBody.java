@@ -2,6 +2,7 @@
 package com.fsck.k9.mail.internet;
 
 import com.fsck.k9.mail.Body;
+import com.fsck.k9.mail.filter.Base64OutputStream;
 import com.fsck.k9.mail.MessagingException;
 
 import java.io.*;
@@ -32,8 +33,12 @@ public class TextBody implements Body {
     public void writeTo(OutputStream out) throws IOException, MessagingException {
         if (mBody != null) {
             byte[] bytes = mBody.getBytes(mCharset);
-            if (MimeUtil.ENC_8BIT.equalsIgnoreCase(mEncoding)) {
+            if (MimeUtil.ENC_8BIT.equalsIgnoreCase(mEncoding) || MimeUtil.ENC_7BIT.equalsIgnoreCase(mEncoding)) {
                 out.write(bytes);
+            } else if ("base64".equals(mEncoding)) {
+                Base64OutputStream bp = new Base64OutputStream(out);
+                bp.write(bytes);
+                bp.close(); // not bp.flush() but close()
             } else {
                 QuotedPrintableOutputStream qp = new QuotedPrintableOutputStream(out, false);
                 qp.write(bytes);

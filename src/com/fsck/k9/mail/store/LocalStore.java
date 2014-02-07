@@ -64,6 +64,7 @@ import com.fsck.k9.mail.MessagingException;
 import com.fsck.k9.mail.Part;
 import com.fsck.k9.mail.Store;
 import com.fsck.k9.mail.filter.Base64OutputStream;
+import com.fsck.k9.mail.filter.EOLConvertingOutputStream;
 import com.fsck.k9.mail.internet.MimeBodyPart;
 import com.fsck.k9.mail.internet.MimeHeader;
 import com.fsck.k9.mail.internet.MimeMessage;
@@ -3057,6 +3058,67 @@ public class LocalStore extends Store implements Serializable {
             setLastPush(0);
             setLastChecked(0);
             setVisibleLimit(mAccount.getDisplayCount());
+        }
+
+        public void exportAllMessages(final File dir, final MessageRetrievalListener listener) throws MessagingException {
+            Message[] localMessages;
+
+            open(OPEN_MODE_RO);
+
+            try {
+                localMessages = database.execute(false, new DbCallback<Message[]>() {
+                    @Override
+                    public Message[] doDbWork(final SQLiteDatabase db) throws WrappedException, UnavailableStorageException {
+                        try {
+                            open(OPEN_MODE_RW);
+                            return LocalStore.this.getMessages(
+                                       null,
+                                       LocalFolder.this,
+                                       "SELECT " + GET_MESSAGES_COLS +
+                                       "FROM messages " +
+                                       "LEFT JOIN threads ON (threads.message_id = messages.id) " +
+                                       "WHERE (empty IS NULL OR empty != 1) AND " +
+                                       "folder_id = ? ORDER BY date DESC",
+                                       new String[] { Long.toString(mFolderId) }
+                                   );
+                        } catch (MessagingException e) {
+                            throw new WrappedException(e);
+                        }
+                    }
+                });
+
+                FetchProfile fp = new FetchProfile();
+                fp.add(FetchProfile.Item.ENVELOPE);
+                fp.add(FetchProfile.Item.BODY);
+
+                fetch(localMessages, fp, null);
+
+                if (listener != null) {
+                    listener.messageFinished(null, 0, localMessages.length);
+                }
+
+                int i = 1;
+                for (Message msg : localMessages) {
+                    File file = Utility.createUniqueFile(dir, String.format("%d.eml", i));
+                    EOLConvertingOutputStream os = new EOLConvertingOutputStream(new FileOutputStream(file.getAbsolutePath()));
+                    try {
+                        msg.writeTo(os);
+                        if (listener != null) {
+                            listener.messageFinished(msg, i, localMessages.length);
+                        }
+                    }
+                    finally {
+                        os.close();
+                    }
+                    i++;
+                }
+            }
+            catch (IOException e) {
+                Log.e(K9.LOG_TAG, "Couldn't write exported file");
+            }
+            catch (WrappedException e) {
+                throw (MessagingException)e.getCause();
+            }
         }
 
         @Override

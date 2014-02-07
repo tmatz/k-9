@@ -20,6 +20,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -920,6 +921,14 @@ public class MimeUtility {
         {".*", "US-ASCII"}
     };
 
+    public static final String[][] CONTENT_TRANSFER_ENCODING_MAP = new String[][] {
+        {"US-ASCII",    "7bit", "7bit"},
+        {"UTF-8",       "8bit", "base64"},
+        {"ISO-8859-1",  "8bit", "quoted-printable"},
+        {"Shift_JIS",   "8bit", "base64"},
+        {"ISO-2022-JP", "7bit", "7bit"}
+    };
+
     public static String unfold(String s) {
         if (s == null) {
             return null;
@@ -1091,7 +1100,7 @@ public class MimeUtility {
                      */
                     InputStream in = part.getBody().getInputStream();
                     try {
-                        String text = readToString(in, charset);
+                        String text = readToString(in, charset, mimeType);
 
                         // Replace the body with a TextBody that already contains the decoded text
                         part.setBody(new TextBody(text));
@@ -2074,6 +2083,13 @@ public class MimeUtility {
             return true;
         }
         /*
+         * If the part is x-pmaildx text and it got this far it's part of a
+         * mixed (et al) and should be rendered inline.
+         */
+        else if ((!attachment) && (part.getMimeType().equalsIgnoreCase("text/x-pmaildx"))) {
+            return true;
+        }
+        /*
          * Finally, if it's nothing else we will include it as an attachment.
          */
         else {
@@ -2089,7 +2105,21 @@ public class MimeUtility {
                 return charset;
         }
 
-        return "UTF-8";
+        return null;
+    }
+
+    public static String getContentTransferEncoding(String charset, boolean safe8bit) {
+        for (String[] contentTransferEncodingMapEntry : CONTENT_TRANSFER_ENCODING_MAP) {
+            if (contentTransferEncodingMapEntry[0].equalsIgnoreCase(charset)) {
+                if (safe8bit) {
+                    return contentTransferEncodingMapEntry[1];
+                }
+                else {
+                    return contentTransferEncodingMapEntry[2];
+                }
+            }
+        }
+        return "base64";
     }
 
     public static String getMimeTypeByExtension(String filename) {
@@ -2218,9 +2248,39 @@ public class MimeUtility {
         return null;
     }
 
+    static HashMap<String,String> defaultCharsetForK9Language;
+    static {
+        defaultCharsetForK9Language= new HashMap<String,String>();
+        defaultCharsetForK9Language.put("en", "us-ascii");
+        defaultCharsetForK9Language.put("ja", "iso-2022-jp");
+    }
+
+    static HashMap<Locale,String> defaultCharsetForLocale;
+    static {
+        defaultCharsetForLocale = new HashMap<Locale,String>();
+        defaultCharsetForLocale.put(Locale.ENGLISH, "us-ascii");
+        defaultCharsetForLocale.put(Locale.JAPAN,   "iso-2022-jp");
+    }
+
+    public static String getDefaultCharset() {
+        String charset;
+
+        charset = defaultCharsetForK9Language.get(K9.getK9Language());
+        if (charset != null) {
+            return charset;
+        }
+
+        charset = defaultCharsetForLocale.get(Locale.getDefault());
+        if (charset != null) {
+            return charset;
+        }
+        return "us-ascii";
+    }
+
     public static String fixupCharset(String charset, Message message) throws MessagingException {
-        if (charset == null || "0".equals(charset))
-            charset = "US-ASCII";  // No encoding, so use us-ascii, which is the standard.
+        if (charset == null || "0".equals(charset)) {
+            charset = MimeUtility.getDefaultCharset();
+        }
 
         charset = charset.toLowerCase(Locale.US);
         if (charset.equals("cp932"))
@@ -2321,8 +2381,16 @@ public class MimeUtility {
     }
 
     public static String readToString(InputStream in, String charset) throws IOException {
+        return readToString(in, charset, null);
+    }
+
+    public static String readToString(InputStream in, String charset, String mimeTypes) throws IOException {
         boolean isIphoneString = false;
 
+        if ("iso-2022-jp".equals(charset) && "text/x-pmaildx".equals(mimeTypes)) {
+            in = new Iso2022JpToShiftJisInputStream(in);
+            charset = "x-docomo-shift_jis-2007";
+        }
         // iso-2022-jp variants are supported by no versions as of Dec 2010.
         if (charset.length() > 19 && charset.startsWith("x-") &&
                 charset.endsWith("-iso-2022-jp-2007") && !Charset.isSupported(charset)) {

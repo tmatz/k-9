@@ -2328,14 +2328,28 @@ public class MimeUtility {
         }
         return null;
     }
+    
+    private static final Pattern patReceivedFrom = Pattern.compile("\\bfrom[\\s]*([^\\s]*)", Pattern.CASE_INSENSITIVE);
 
     private static String getAddressFromReceivedHeader(String receivedHeader) {
         // Not implemented yet!  Extract an address from the FOR clause of the given Received header.
+        Matcher m = patReceivedFrom.matcher(receivedHeader);
+        if (m.find()) {
+            return m.group(1);
+         }
         return null;
     }
 
     private static String getJisVariantFromFromHeaders(Message message) throws MessagingException {
-        Address addresses[] = message.getFrom();
+        Address addresses[] = message.getRecipients(RecipientType.TO);
+        if (addresses != null && addresses.length > 0)
+        {
+        	if (isInDomain(addresses[0].getAddress(), "ezweb.ne.jp"))
+        	{
+        		return "kddi";
+        	}
+        }
+        addresses = message.getFrom();
         if (addresses == null || addresses.length == 0)
             return null;
 

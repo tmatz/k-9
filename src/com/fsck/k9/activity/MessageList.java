@@ -534,6 +534,9 @@ public class MessageList extends K9FragmentActivity implements MessageListFragme
                 getLayoutInflater().inflate(R.layout.actionbar_indeterminate_progress_actionview, null);
 
         mActionBar.setDisplayHomeAsUpEnabled(true);
+        if (K9.typefaceEmoji != null) {
+            mActionBarSubject.setTypeface(K9.typefaceEmoji);
+        }
     }
 
     @Override

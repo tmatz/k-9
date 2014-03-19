@@ -19,6 +19,7 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Debug;
 import android.os.Environment;
@@ -180,6 +181,11 @@ public class K9 extends Application {
      */
     public static boolean ENABLE_ERROR_FOLDER = true;
     public static String ERROR_FOLDER_NAME = "K9mail-errors";
+
+    /**
+     * Typeface for emoji.
+     */
+    public static Typeface typefaceEmoji = null;
 
     /**
      * A reference to the {@link SharedPreferences} used for caching the last known database
@@ -597,6 +603,11 @@ public class K9 extends Application {
          * doesn't work in Android and MimeMessage does not have access to a Context.
          */
         BinaryTempFileBody.setTempDirectory(getCacheDir());
+        
+        /*
+         * Build typeface for emoji.
+         */
+        typefaceEmoji = Typeface.createFromAsset(getAssets(), "SymbolaGoomoji.ttf");
 
         LocalKeyStore.setKeyStoreLocation(getDir("KeyStore", MODE_PRIVATE).toString());
 

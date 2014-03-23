@@ -2341,15 +2341,7 @@ public class MimeUtility {
     }
 
     private static String getJisVariantFromFromHeaders(Message message) throws MessagingException {
-        Address addresses[] = message.getRecipients(RecipientType.TO);
-        if (addresses != null && addresses.length > 0)
-        {
-        	if (isInDomain(addresses[0].getAddress(), "ezweb.ne.jp"))
-        	{
-        		return "kddi";
-        	}
-        }
-        addresses = message.getFrom();
+        Address addresses[] = message.getFrom();
         if (addresses == null || addresses.length == 0)
             return null;
 

@@ -106,6 +106,10 @@ public class MessageHeader extends LinearLayout implements OnClickListener {
         mDateView = (TextView) findViewById(R.id.date);
         mFlagged = (CheckBox) findViewById(R.id.flagged);
 
+        if (K9.typefaceEmoji != null) {
+            mSubjectView.setTypeface(K9.typefaceEmoji);
+        }
+
         defaultSubjectColor = mSubjectView.getCurrentTextColor();
         mFontSizes.setViewTextSize(mSubjectView, mFontSizes.getMessageViewSubject());
         mFontSizes.setViewTextSize(mDateView, mFontSizes.getMessageViewDate());

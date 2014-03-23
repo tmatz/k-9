@@ -1855,6 +1855,10 @@ public class MessageListFragment extends SherlockFragment implements OnItemClick
 
             }
 
+            if (K9.typefaceEmoji != null) {
+                holder.preview.setTypeface(K9.typefaceEmoji);
+            }
+
             QuickContactBadge contactBadge =
                     (QuickContactBadge) view.findViewById(R.id.contact_badge);
             if (mContactsPictureLoader != null) {
@@ -2087,7 +2091,7 @@ public class MessageListFragment extends SherlockFragment implements OnItemClick
                             null); // bottom
                 }
 
-                holder.subject.setTypeface(null, maybeBoldTypeface);
+                holder.subject.setTypeface(K9.typefaceEmoji, maybeBoldTypeface);
                 holder.subject.setText(subject);
             }
 
